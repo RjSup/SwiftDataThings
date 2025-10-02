@@ -13,12 +13,12 @@ struct ContentView: View {
     @Environment(\.modelContext) var modelContext
     // query swiftdata for user User.name instances
     // using a predicate to access the exact data we need
-    @Query(filter: #Predicate<User> { user in
-        user.name.localizedStandardContains("R") &&
-        user.city == "New York" ||
-        user.name.localizedStandardContains("J") &&
-        user.city == "London"
-    }, sort: \User.name) var users: [User]
+    @State private var showingUpcoingOnly: Bool = false
+    // to store the curr sort order
+    @State private var sortOrder = [
+        SortDescriptor(\User.name),
+        SortDescriptor(\User.joinDate)
+    ]
     
     // store a path for navigation
     @State private var path: [User] = [User]()
@@ -26,9 +26,7 @@ struct ContentView: View {
     var body: some View {
         // navigation context using the path
         NavigationStack {
-            List(users) { user in
-                Text(user.name)
-            }
+            UsersView(minJoinDate: showingUpcoingOnly ? .now : .distantPast, sortOrder: sortOrder)
             .navigationTitle("Users")
             .toolbar {
                 Button("Add Samples", systemImage: "plus") {
@@ -45,6 +43,24 @@ struct ContentView: View {
                     modelContext.insert(second)
                     modelContext.insert(third)
                     modelContext.insert(fourth)
+                }
+                Button(showingUpcoingOnly ? "Show Everyone" : "Show Upcoming") {
+                    showingUpcoingOnly.toggle()
+                }
+                Menu("Sort", systemImage: "arrow.up.arrow.down") {
+                    Picker("Sort", selection: $sortOrder) {
+                        Text("Sort  by name")
+                            .tag([
+                                SortDescriptor(\User.name),
+                                SortDescriptor(\User.joinDate)
+                            ])
+                        
+                        Text("Sort by Join Data")
+                            .tag([
+                                SortDescriptor(\User.joinDate),
+                                SortDescriptor(\User.name)
+                            ])
+                    }
                 }
             }
         }
