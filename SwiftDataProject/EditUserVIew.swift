@@ -25,8 +25,9 @@ struct EditUserVIew: View {
 #Preview {
     do {
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
-        let container = try ModelContainer(for: User.self, configurations: config)
+        let container = try ModelContainer(for: [User.self, Job.self], configurations: config)
         let user = User(name: "Ryan", city: "Oxford", joinDate: .now)
+        _ = Job(title: "Engineer", startDate: .now, user: user)
         return EditUserVIew(user: user)
             .modelContainer(container)
     } catch {

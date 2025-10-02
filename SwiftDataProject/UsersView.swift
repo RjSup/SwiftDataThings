@@ -29,5 +29,5 @@ struct UsersView: View {
 
 #Preview {
     UsersView(minJoinDate: .now, sortOrder: [SortDescriptor(\User.name)])
-        .modelContainer(for: User.self)
+        .modelContainer(for: [User.self, Job.self])
 }
